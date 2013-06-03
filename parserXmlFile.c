@@ -1,12 +1,12 @@
 #include<libxml/parser.h>
 #include<stdio.h>
 int parserXmlFile(char *rootName);
-/*int main()
+int main()
 {
     char *str = "root.xml";
     parserXmlFile(str);
     return 0;
-}*/
+}
 int parserXmlFile(char *rootName)
 {
     xmlDocPtr doc; // djf定义解析文档指针
@@ -31,15 +31,22 @@ int parserXmlFile(char *rootName)
         return -1;
     }
 
-    curNode=curNode->xmlChildrenNode;
+    //curNode=curNode->xmlChildrenNode;
+    curNode = curNode->children;
     xmlNodePtr propNodePtr = curNode;
 
-    while (curNode != NULL)
+    while (curNode != NULL) //打印第一层节点
     {
-        printf("name:%s\t",curNode->name);
-       // xmlNodePtr obj = curNode->xml
+            printf("--------------------------------\n");
+        printf("bucket:%s\t\n",curNode->name);
+        xmlNodePtr obj = curNode->children;
+        while(obj!=NULL)//打印第二层节点
+        {
+              printf("object in bucket %s :\n%s/%s\n",curNode->name,curNode->name,obj->name);
+              obj=obj->next;
+        }
 
-        xmlFree(szKey);
+
         curNode = curNode->next;
     }
     xmlFreeDoc(doc);
