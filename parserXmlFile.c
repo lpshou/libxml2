@@ -1,26 +1,96 @@
 #include<libxml/parser.h>
 #include<stdio.h>
+#include<string.h>
+#include "md5.h"
 int parserXmlFile(char *rootName);
 int listBucket(char *clientName);
 int listObjectInBucket(char *rootName,char *BucketName);
 int main()
 {
-    char *str = "client1.xml";
+    char *xmlFileName = "client1.xml";
     char *bucketName = "buc2";
-    listObjectInBucket(str,bucketName);
-    //listBucket(str);
+    PutInCacheFile("a.txt",xmlFileName);
+    //listObjectInBucket(xmlFileName,bucketName);
+    //listBucket(xmlFileName);
     //parserXmlFile(str);
     return 0;
 }
+//cache file
+int PutInCacheFile(char *fileName,char *xmlFileName)
+{
+    FILE *fp;
+    if ((fp=fopen(fileName,"w"))==NULL)
+    {
+        printf("cannot open file\n");
+        exit(0);
+    }
+    xmlDocPtr doc; // djf定义解析文档指针
+    xmlNodePtr rootNode,bucNode,objNode;//定义节点指针（在各个节点之间移动）
+
+    char *szDocName;
+    szDocName = (char *)xmlFileName;
+    doc = xmlReadFile(szDocName,"GB2312",XML_PARSE_RECOVER);
+    if (doc == NULL)
+    {
+        printf("document not parsed successfully");
+        return -1;
+    }
+
+    //确定文档根元素
+    rootNode = xmlDocGetRootElement(doc);
+    if (rootNode == NULL)
+    {
+        printf("empty document");
+        xmlFreeDoc(doc);
+        return -1;
+    }
+
+    //curNode=curNode->xmlChildrenNode;
+    bucNode = rootNode->children;
+
+    printf("--------------------------------\n");
+    while (bucNode != NULL) //打印第一层节点
+    {
+        objNode = bucNode->children;
+        while (objNode!=NULL)//打印第二层节点
+        {
+            unsigned char temp[50];
+            strcpy(temp,rootNode->name);
+            strcat(temp,"/");
+            strcat(temp,bucNode->name);
+            strcat(temp,"/");
+            strcat(temp,objNode->name);
+            int len = strlen(temp);
+
+           //生成md5值
+            unsigned char md5sum[16]={0};
+            unsigned char md5_str[33]={0};
+            md5(temp,len,md5sum);
+            md5_2_str(md5sum,md5_str);
+
+
+            printf("%s\t%s\n",temp,md5_str);
+            fprintf(fp,"%s\t%s\n",temp,md5_str);
+            objNode=objNode->next;
+        }
+
+        bucNode = bucNode->next;
+    }
+    xmlFreeDoc(doc);
+    fclose(fp);
+
+
+}
+
 //list object in bucket
-int listObjectInBucket(char *rootName,char *BucketName)
+int listObjectInBucket(char *xmlFileName,char *BucketName)
 {
     xmlDocPtr doc; // djf定义解析文档指针
     xmlNodePtr curNode;//定义节点指针（在各个节点之间移动）
     xmlChar *szKey;//定义临时字符串变量
 
     char *szDocName;
-    szDocName = (char *)rootName;
+    szDocName = (char *)xmlFileName;
     doc = xmlReadFile(szDocName,"GB2312",XML_PARSE_RECOVER);
     if (doc == NULL)
     {
@@ -61,14 +131,14 @@ int listObjectInBucket(char *rootName,char *BucketName)
 }
 
 //list bucket
-int listBucket(char *clientName)
+int listBucket(char *xmlFileName)
 {
     xmlDocPtr doc; // djf定义解析文档指针
     xmlNodePtr curNode;//定义节点指针（在各个节点之间移动）
     xmlChar *szKey;//定义临时字符串变量
 
     char *szDocName;
-    szDocName = (char *)clientName;
+    szDocName = (char *)xmlFileName;
     doc = xmlReadFile(szDocName,"GB2312",XML_PARSE_RECOVER);
     if (doc == NULL)
     {
@@ -90,7 +160,7 @@ int listBucket(char *clientName)
     xmlNodePtr propNodePtr = curNode;
 
     printf("--------------------------------\n");
-    printf("buckets in %s:\n",clientName);
+    printf("buckets in %s:\n",xmlFileName);
     while (curNode != NULL) //打印第一层节点
     {
 
