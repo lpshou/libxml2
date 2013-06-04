@@ -1,3 +1,11 @@
+/*compiler command:
+*gcc -I/usr/local/include/libxml2 -L/usr/local/lib -lxml2 -lz -lm -o parserXmlFile *md5.c parserXmlFile.c 
+*root@master:/usr/local/project# ./parserXmlFile 
+*output:
+*--------------------------------
+*client1/buc1/obj1	db168c88e0e47e82eb459d7b1cd138b1
+*client1/buc1/obj2	dd999122cbef13633f0728900e5a8d7a
+*/
 #include<libxml/parser.h>
 #include<stdio.h>
 #include<string.h>
