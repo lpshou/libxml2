@@ -52,7 +52,6 @@ int PutInCacheFile(char *fileName,char *xmlFileName)
 
     //curNode=curNode->xmlChildrenNode;
     bucNode = rootNode->children;
-
     printf("--------------------------------\n");
     while (bucNode != NULL) //打印第一层节点
     {
