@@ -1,15 +1,12 @@
-/*compiler command:
-* gcc -I/usr/local/include/libxml2 -L/usr/local/lib -lxml2 -lz -lm -ltokyocabinet -ltokyotyrant -o parserXmlFile md5.c parserXmlFile.c tt.c
-*root@master:/usr/local/project# ./parserXmlFile 
-*output:
-*--------------------------------
-*client1/buc1/obj1	db168c88e0e47e82eb459d7b1cd138b1
-*client1/buc1/obj2	dd999122cbef13633f0728900e5a8d7a
+/*
+* gcc -I/usr/local/include/libxml2 -L/usr/local/lib -lxml2 -lz -lm -ltokyocabinet -ltokyotyrant -o parserXmlFile md5.c parserXmlFile.c ttnet.c
 */
 #include<libxml/parser.h>
 #include<stdio.h>
 #include<string.h>
 #include "md5.h"
+#include"global.h"
+#include"md_type.h"
 int parserXmlFile(char *rootName);
 int listBucket(char *clientName);
 int listObjectInBucket(char *rootName,char *BucketName);
@@ -17,7 +14,7 @@ int main()
 {
     char *xmlFileName = "client1.xml";
     char *bucketName = "buc2";
-    PutInCacheFile("a.txt",xmlFileName);
+    PutInCacheFile("cacheFile.txt",xmlFileName);
     //listObjectInBucket(xmlFileName,bucketName);
     //listBucket(xmlFileName);
     //parserXmlFile(str);
@@ -70,15 +67,24 @@ int PutInCacheFile(char *fileName,char *xmlFileName)
             strcat(temp,objNode->name);
             int len = strlen(temp);
 
-           //生成md5值
+            //生成md5值
             unsigned char md5sum[16]={0};
             unsigned char md5_str[33]={0};
             md5(temp,len,md5sum);
             md5_2_str(md5sum,md5_str);
 
+                //生成value值
+            Meta_Data *metaData = (Meta_Data *)malloc(sizeof(Meta_Data));
+            Meta_Data *meta1 = (Meta_Data *)malloc(sizeof(Meta_Data));
+            strcpy(metaData->replica[0].rep_ip,"192.168.0.18");
 
-            printf("%s\t%s\n",temp,md5_str);
-            fprintf(fp,"%s\t%s\n",temp,md5_str);
+            md_put(md5_str,metaData);
+                GetValue(md5_str,meta1);
+            printf("the value  is %s\n",meta1->replica[0].rep_ip);
+            //printf("%s\t%s\n",temp,md5_str);
+            fprintf(fp,"%s\t%s\t%s\n",temp,md5_str,meta1->replica[0].rep_ip);
+            // PutValue(temp,md5_str);
+
             objNode=objNode->next;
         }
 
