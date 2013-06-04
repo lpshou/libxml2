@@ -1,5 +1,5 @@
 /*compiler command:
-*gcc -I/usr/local/include/libxml2 -L/usr/local/lib -lxml2 -lz -lm -o parserXmlFile *md5.c parserXmlFile.c 
+* gcc -I/usr/local/include/libxml2 -L/usr/local/lib -lxml2 -lz -lm -ltokyocabinet -ltokyotyrant -o parserXmlFile md5.c parserXmlFile.c tt.c
 *root@master:/usr/local/project# ./parserXmlFile 
 *output:
 *--------------------------------
