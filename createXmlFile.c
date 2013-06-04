@@ -54,7 +54,6 @@ void createXmlFile(xmlChar* rootName)
      xmlNodePtr node3 = xmlNewNode(NULL,BAD_CAST"obj3");
      xmlAddChild(node,node3);*/
 
-
     //存储xml文档
     xmlChar str[50];
     strcpy(str,rootName);
